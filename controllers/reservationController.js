@@ -1,18 +1,15 @@
 import Reservation from '../models/Reservation.js'
+import Restaurant from '../models/Restaurant.js'
 import {
-	CLOSE_HOUR,
 	DEFAULT_DURATION_MINUTES,
 	MAX_CAPACITY,
-	OPEN_HOUR,
 } from '../scripts/rules-reservation.js'
-
-function getTotalMinutes(date) {
-	return date.getHours() * 60 + date.getMinutes()
-}
-
-function isValidStatus(status) {
-	return ['pending', 'confirmed', 'cancelled', 'completed'].includes(status)
-}
+import {
+	getDayKeyFromDate,
+	getTotalMinutes,
+	isValidStatus,
+	parseTimeToMinutes,
+} from '../utils/index.js'
 
 export const createReservation = async (req, res, next) => {
 	try {
@@ -62,10 +59,39 @@ export const createReservation = async (req, res, next) => {
 			bookingStart.getTime() + DEFAULT_DURATION_MINUTES * 60 * 1000,
 		)
 
+		const restaurant = await Restaurant.findOne()
+
+		if (!restaurant) {
+			return res.status(500).json({
+				success: false,
+				message: 'Restaurant working hours are not configured',
+			})
+		}
+
+		const dayKey = getDayKeyFromDate(bookingStart)
+		const dayConfig = restaurant.workingHours?.[dayKey]
+
+		if (!dayConfig || dayConfig.isClosed) {
+			return res.status(400).json({
+				success: false,
+				message: 'Restaurant is closed on selected day',
+			})
+		}
+
+		const openMinutes = parseTimeToMinutes(dayConfig.openTime)
+		const closeMinutes = parseTimeToMinutes(dayConfig.closeTime)
+
+		if (openMinutes === null || closeMinutes === null) {
+			return res.status(500).json({
+				success: false,
+				message: 'Invalid working hours configuration',
+			})
+		}
+
 		const startMinutes = getTotalMinutes(bookingStart)
 		const endMinutes = getTotalMinutes(bookingEnd)
 
-		if (startMinutes < OPEN_HOUR * 60 || endMinutes > CLOSE_HOUR * 60) {
+		if (startMinutes < openMinutes || endMinutes > closeMinutes) {
 			return res.status(400).json({
 				success: false,
 				message: 'Selected time is outside working hours',
@@ -186,7 +212,6 @@ export const updateReservationStatus = async (req, res, next) => {
 			})
 		}
 
-		// oddiy logika: cancelled yoki completed bo'lgan bronni qayta confirmed qilishni xohlamasang shu joyda cheklash mumkin
 		if (reservation.status === 'completed' && status !== 'completed') {
 			return res.status(400).json({
 				success: false,

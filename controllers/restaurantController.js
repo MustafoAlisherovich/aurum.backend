@@ -1,6 +1,6 @@
 import Restaurant from '../models/Restaurant.js'
 
-export const getRestaurants = async (req, res) => {
+export const getRestaurants = async (req, res, next) => {
 	try {
 		const restaurant = await Restaurant.findOne()
 
@@ -16,7 +16,7 @@ export const getRestaurants = async (req, res) => {
 	}
 }
 
-export const upsertRestaurant = async (req, res) => {
+export const upsertRestaurant = async (req, res, next) => {
 	try {
 		const data = req.body
 		const restaurant = await Restaurant.findOneAndUpdate({}, data, {
