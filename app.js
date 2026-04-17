@@ -8,6 +8,7 @@ import { errorHandler, notFoundHandler } from './middlewares/errorHandlers.js'
 import adminAuthRoutes from './routes/adminAuthRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
 import dishRoutes from './routes/dishRoutes.js'
+import galleryRoutes from './routes/galleryRoutes.js'
 import reservationRoutes from './routes/reservationRoutes.js'
 import restaurantRoutes from './routes/restaurantRoutes.js'
 
@@ -27,6 +28,7 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/reservations', reservationRoutes)
 app.use('/api/admin/restaurants', restaurantRoutes)
 app.use('/api/admin/dishes', dishRoutes)
+app.use('/api/admin/gallery', galleryRoutes)
 
 // Admin auth (login/logout) and protected admin panel routes.
 app.use('/api/admin', adminAuthRoutes)
