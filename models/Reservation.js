@@ -48,6 +48,14 @@ const reservationSchema = new mongoose.Schema(
 			enum: ['pending', 'confirmed', 'cancelled', 'completed'],
 			default: 'pending',
 		},
+		restaurant: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Restaurant',
+			required: true,
+		},
+		reviewToken: { type: String, default: null },
+		reviewTokenExpiresAt: { type: Date, default: null },
+		reviewSubmitted: { type: Boolean, default: false },
 	},
 	{ timestamps: true },
 )
