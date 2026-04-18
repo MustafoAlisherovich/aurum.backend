@@ -9,6 +9,7 @@ import {
 	getReservations,
 	updateReservationStatus,
 } from '../controllers/reservationController.js'
+import { requireAdminAuth } from '../middlewares/authMiddleware.js'
 
 const router = Router()
 
@@ -16,10 +17,10 @@ router.post('/', createReservation)
 router.get('/', getReservations)
 router.get('/:id', getReservationById)
 
-router.patch('/:id/status', updateReservationStatus)
-router.patch('/:id/confirm', confirmReservation)
-router.patch('/:id/cancel', cancelReservation)
-router.patch('/:id/complete', completeReservation)
+router.patch('/:id/status', requireAdminAuth, updateReservationStatus)
+router.patch('/:id/confirm', requireAdminAuth, confirmReservation)
+router.patch('/:id/cancel', requireAdminAuth, cancelReservation)
+router.patch('/:id/complete', requireAdminAuth, completeReservation)
 
 router.delete('/:id', deleteReservation)
 

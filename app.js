@@ -6,18 +6,25 @@ import connectDB from './config/db.js'
 import { requireAdminAuth } from './middlewares/authMiddleware.js'
 import { errorHandler, notFoundHandler } from './middlewares/errorHandlers.js'
 import adminAuthRoutes from './routes/adminAuthRoutes.js'
+import adminReviewRoutes from './routes/adminReviewRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
 import dishRoutes from './routes/dishRoutes.js'
 import galleryRoutes from './routes/galleryRoutes.js'
 import reservationRoutes from './routes/reservationRoutes.js'
 import restaurantRoutes from './routes/restaurantRoutes.js'
+import reviewRoutes from './routes/reviewRoutes.js'
 
 const app = express()
 const port = Number(process.env.PORT) || 4000
 
 await connectDB()
 
-app.use(cors())
+app.use(
+	cors({
+		origin: 'http://localhost:8080',
+		credentials: true,
+	}),
+)
 app.use(express.json())
 app.use(cookieParser())
 
@@ -26,9 +33,11 @@ app.get('/api/health', (_req, res) => {
 })
 
 app.use('/api/reservations', reservationRoutes)
+app.use('/api/review', reviewRoutes)
 app.use('/api/admin/restaurants', restaurantRoutes)
 app.use('/api/admin/dishes', dishRoutes)
 app.use('/api/admin/gallery', galleryRoutes)
+app.use('/api/admin/review', adminReviewRoutes)
 
 // Admin auth (login/logout) and protected admin panel routes.
 app.use('/api/admin', adminAuthRoutes)

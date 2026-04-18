@@ -47,9 +47,9 @@ function getCookieMaxAgeMs() {
 	return 24 * 60 * 60 * 1000
 }
 
-export function loginAdmin(req, res) {
+export function loginAdmin(req, res, next) {
 	try {
-		const { username, password } = req.body || {}
+		const { username, password } = req.body
 
 		if (!username || !password) {
 			return res
@@ -70,8 +70,7 @@ export function loginAdmin(req, res) {
 		const jwtSecret = getJwtSecret()
 		const jwtExpiresIn = getJwtExpiresIn()
 
-		const token = jwt.sign(jwtSecret, {
-			subject: adminUsername,
+		const token = jwt.sign({ sub: adminUsername }, jwtSecret, {
 			expiresIn: jwtExpiresIn,
 		})
 

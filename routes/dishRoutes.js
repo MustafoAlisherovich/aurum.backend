@@ -5,12 +5,13 @@ import {
 	getDishes,
 	updateDish,
 } from '../controllers/dishController.js'
+import { requireAdminAuth } from '../middlewares/authMiddleware.js'
 
 const router = Router()
 
-router.get('/', getDishes)
-router.post('/', createDish)
-router.put('/:id', updateDish)
-router.delete('/:id', deleteDish)
+router.get('/', requireAdminAuth, getDishes)
+router.post('/', requireAdminAuth, createDish)
+router.put('/:id', requireAdminAuth, updateDish)
+router.delete('/:id', requireAdminAuth, deleteDish)
 
 export default router
