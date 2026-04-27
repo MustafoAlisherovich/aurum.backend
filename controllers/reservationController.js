@@ -4,6 +4,7 @@ import {
 	DEFAULT_DURATION_MINUTES,
 	MAX_CAPACITY,
 } from '../scripts/rules-reservation.js'
+import { sendReviewEmail } from '../services/reviewService.js'
 import {
 	getDayKeyFromDate,
 	getTotalMinutes,
@@ -126,6 +127,7 @@ export const createReservation = async (req, res, next) => {
 			durationMinutes: DEFAULT_DURATION_MINUTES,
 			description: description || '',
 			status: 'pending',
+			restaurant: restaurant._id,
 		})
 
 		return res.status(201).json({
@@ -219,13 +221,16 @@ export const updateReservationStatus = async (req, res, next) => {
 			})
 		}
 
-		reservation.status = status
-		await reservation.save()
+		const updated = await Reservation.findByIdAndUpdate(
+			id,
+			{ status },
+			{ returnDocument: 'after', runValidators: true },
+		)
 
 		return res.status(200).json({
 			success: true,
 			message: `Reservation status updated to ${status}`,
-			reservation,
+			reservation: updated,
 		})
 	} catch (error) {
 		next(error)
@@ -259,13 +264,16 @@ export const confirmReservation = async (req, res, next) => {
 			})
 		}
 
-		reservation.status = 'confirmed'
-		await reservation.save()
+		const updated = await Reservation.findByIdAndUpdate(
+			id,
+			{ status: 'confirmed' },
+			{ returnDocument: 'after', runValidators: true },
+		)
 
 		return res.status(200).json({
 			success: true,
 			message: 'Reservation confirmed successfully',
-			reservation,
+			reservation: updated,
 		})
 	} catch (error) {
 		next(error)
@@ -292,13 +300,16 @@ export const cancelReservation = async (req, res, next) => {
 			})
 		}
 
-		reservation.status = 'cancelled'
-		await reservation.save()
+		const updated = await Reservation.findByIdAndUpdate(
+			id,
+			{ status: 'cancelled' },
+			{ returnDocument: 'after', runValidators: true },
+		)
 
 		return res.status(200).json({
 			success: true,
 			message: 'Reservation cancelled successfully',
-			reservation,
+			reservation: updated,
 		})
 	} catch (error) {
 		next(error)
@@ -325,8 +336,17 @@ export const completeReservation = async (req, res, next) => {
 			})
 		}
 
+		if (reservation.status === 'completed') {
+			return res.status(400).json({
+				success: false,
+				message: 'Reservation already completed',
+			})
+		}
+
 		reservation.status = 'completed'
 		await reservation.save()
+
+		sendReviewEmail(reservation._id)
 
 		return res.status(200).json({
 			success: true,

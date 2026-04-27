@@ -13,7 +13,7 @@ class MailService {
 		})
 	}
 
-	async sendMessage(to, subject, html) {
+	async sendMessage({ to, subject, html }) {
 		const info = await this.transporter.sendMail({
 			from: `"Aurum" <${process.env.SMTP_USER}>`,
 			to,

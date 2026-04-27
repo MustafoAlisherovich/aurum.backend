@@ -1,17 +1,8 @@
 import { Router } from 'express'
-import {
-	createDish,
-	deleteDish,
-	getDishes,
-	updateDish,
-} from '../controllers/dishController.js'
-import { requireAdminAuth } from '../middlewares/authMiddleware.js'
+import { getDishes } from '../controllers/dishController.js'
 
 const router = Router()
 
-router.get('/', requireAdminAuth, getDishes)
-router.post('/', requireAdminAuth, createDish)
-router.put('/:id', requireAdminAuth, updateDish)
-router.delete('/:id', requireAdminAuth, deleteDish)
+router.get('/', getDishes)
 
 export default router

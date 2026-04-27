@@ -1,6 +1,7 @@
 import Restaurant from '../models/Restaurant.js'
+import { getCurrentStatus } from '../utils/index.js'
 
-export const getRestaurants = async (req, res, next) => {
+export const getRestaurant = async (req, res, next) => {
 	try {
 		const restaurant = await Restaurant.findOne()
 
@@ -10,7 +11,9 @@ export const getRestaurants = async (req, res, next) => {
 				.json({ success: false, message: 'Restaurant not found' })
 		}
 
-		return res.status(200).json({ success: true, restaurant })
+		const status = getCurrentStatus(restaurant.workingHours)
+
+		return res.status(200).json({ success: true, restaurant, status })
 	} catch (error) {
 		next(error)
 	}
@@ -20,7 +23,7 @@ export const upsertRestaurant = async (req, res, next) => {
 	try {
 		const data = req.body
 		const restaurant = await Restaurant.findOneAndUpdate({}, data, {
-			new: true,
+			returnDocument: 'after',
 			upsert: true,
 			runValidators: true,
 		})

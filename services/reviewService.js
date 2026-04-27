@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import Reservation from '../models/Reservation.js'
+import emailTemplate from '../template/emailTemplate.js'
 import mailService from './mailService.js'
 
 export const sendReviewEmail = async reservationId => {
@@ -11,21 +12,20 @@ export const sendReviewEmail = async reservationId => {
 
 	const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)
 
-	reservation.reviewToken = token
-	reservation.reviewTokenExpiresAt = expires
-	await reservation.save()
+	await Reservation.findByIdAndUpdate(
+		reservationId,
+		{
+			reviewToken: token,
+			reviewTokenExpiresAt: expires,
+		},
+		{ runValidators: true },
+	)
 
-	const reviewLink = `http://localhost:3000/review/${token}`
+	const reviewLink = `${process.env.CLIENT_URL}/review/${token}`
 
 	await mailService.sendMessage({
 		to: reservation.email,
 		subject: 'Your opinion is important to us',
-		html: `
-		<h2>Salom ${reservation.fullName}</h2>
-			<p>Sizning tashrifingiz uchun rahmat!</p>
-			<a href="${reviewLink}">
-				Review qoldirish
-			</a>
-		`,
+		html: emailTemplate(reservation, reviewLink),
 	})
 }

@@ -1,7 +1,18 @@
+import { isValidObjectId } from 'mongoose'
 import imagekit from '../config/imagekit.js'
 import Gallery from '../models/Gallery.js'
 
 export const getGallery = async (req, res, next) => {
+	try {
+		const data = req.body
+		const gallery = await Gallery.find(data)
+		res.status(200).json({ success: true, gallery })
+	} catch (error) {
+		next(error)
+	}
+}
+
+export const getAdminGallery = async (req, res, next) => {
 	try {
 		const data = req.body
 		const gallery = await Gallery.find(data)
@@ -39,21 +50,34 @@ export const createGallery = async (req, res, next) => {
 
 export const deleteGallery = async (req, res, next) => {
 	try {
-		const gallery = await Gallery.findById(req.params.id)
+		const { id } = req.params
 
-		if (!gallery) {
-			return res
-				.status(400)
-				.json({ success: false, message: 'Gallery not found' })
+		if (!id || !isValidObjectId(id)) {
+			return res.status(400).json({
+				success: false,
+				message: 'Invalid gallery id',
+			})
 		}
 
-		if (dish.image?.fileId) {
+		const gallery = await Gallery.findById(id)
+
+		if (!gallery) {
+			return res.status(404).json({
+				success: false,
+				message: 'Gallery not found',
+			})
+		}
+
+		if (gallery.image?.fileId) {
 			await imagekit.deleteFile(gallery.image.fileId)
 		}
 
-		await Gallery.findByIdAndDelete(req.params.id)
+		await Gallery.findByIdAndDelete(id)
 
-		res.json({ success: true, message: 'Gallery deleted' })
+		res.json({
+			success: true,
+			message: 'Gallery deleted',
+		})
 	} catch (error) {
 		next(error)
 	}

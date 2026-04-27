@@ -1,13 +1,8 @@
 import { Router } from 'express'
-import {
-	getRestaurants,
-	upsertRestaurant,
-} from '../controllers/restaurantController.js'
-import { requireAdminAuth } from '../middlewares/authMiddleware.js'
+import { getRestaurant } from '../controllers/restaurantController.js'
 
 const router = Router()
 
-router.get('/', requireAdminAuth, getRestaurants)
-router.put('/', requireAdminAuth, upsertRestaurant)
+router.get('/', getRestaurant)
 
 export default router

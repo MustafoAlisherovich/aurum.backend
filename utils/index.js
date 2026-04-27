@@ -21,3 +21,31 @@ export function parseTimeToMinutes(timeStr) {
 export function isValidStatus(status) {
 	return ['pending', 'confirmed', 'cancelled', 'completed'].includes(status)
 }
+
+export const getCurrentStatus = workingHours => {
+	const now = new Date()
+
+	const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+	const todayKey = days[now.getDay()]
+	const today = workingHours[todayKey]
+
+	if (!today || today.isClosed) {
+		return { isOpen: false, closesAt: null }
+	}
+
+	const [openH, openM] = today.openTime.split(':').map(Number)
+	const [closeH, closeM] = today.closeTime.split(':').map(Number)
+
+	const openDate = new Date()
+	openDate.setHours(openH, openM, 0)
+
+	const closeDate = new Date()
+	closeDate.setHours(closeH, closeM, 0)
+
+	const isOpen = now >= openDate && now <= closeDate
+
+	return {
+		isOpen,
+		closesAt: isOpen ? today.closeTime : null,
+	}
+}

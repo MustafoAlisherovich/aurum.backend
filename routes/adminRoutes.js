@@ -1,8 +1,5 @@
 import { Router } from 'express'
-import {
-	getAdminBookings,
-	getDashboardStats,
-} from '../controllers/adminController.js'
+import { getDashboardStats } from '../controllers/adminController.js'
 import { requireAdminAuth } from '../middlewares/authMiddleware.js'
 
 const router = Router()
@@ -20,6 +17,5 @@ router.get('/me', requireAdminAuth, (req, res) => {
 })
 
 router.get('/dashboard/stats', requireAdminAuth, getDashboardStats)
-router.get('/bookings', requireAdminAuth, getAdminBookings)
 
 export default router

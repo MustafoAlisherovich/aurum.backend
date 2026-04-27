@@ -1,14 +1,21 @@
 import imagekit from '../config/imagekit.js'
 import Dish from '../models/Dish.js'
 
+export const getAdminDishes = async (req, res, next) => {
+	try {
+		const dishes = await Dish.find()
+
+		res.status(200).json({ success: true, dishes })
+	} catch (error) {
+		next(error)
+	}
+}
+
 export const getDishes = async (req, res, next) => {
 	try {
-		const { page = 1, limit = 10 } = req.query
 		const dishes = await Dish.find()
-			.skip((page - 1) * limit)
-			.limit(Number(limit))
 
-		res.status(200).json({ success: true, count: dishes.length, data: dishes })
+		res.status(200).json({ success: true, dishes })
 	} catch (error) {
 		next(error)
 	}
@@ -68,14 +75,14 @@ export const updateDish = async (req, res, next) => {
 				url: uploadImage.url,
 				fileId: uploadImage.fileId,
 			}
-
-			const uploadDish = await Dish.findByIdAndUpdate(id, data, {
-				new: true,
-				runValidators: true,
-			})
-
-			res.status(200).json({ success: true, dish: uploadDish })
 		}
+
+		const updatedDish = await Dish.findByIdAndUpdate(id, data, {
+			returnDocument: 'after',
+			runValidators: true,
+		})
+
+		res.status(200).json({ success: true, dish: updatedDish })
 	} catch (error) {
 		next(error)
 	}

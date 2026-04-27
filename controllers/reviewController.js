@@ -92,10 +92,15 @@ export const createReviewByToken = async (req, res, next) => {
 			comment,
 		})
 
-		reservation.reviewSubmitted = true
-		reservation.reviewToken = null
-		reservation.reviewTokenExpiresAt = null
-		await reservation.save()
+		await Reservation.findByIdAndUpdate(
+			reservation._id,
+			{
+				reviewSubmitted: true,
+				reviewToken: null,
+				reviewTokenExpiresAt: null,
+			},
+			{ runValidators: true },
+		)
 
 		return res.status(201).json({ success: true, review })
 	} catch (error) {
@@ -106,30 +111,39 @@ export const createReviewByToken = async (req, res, next) => {
 export const updateReviewStatus = async (req, res, next) => {
 	try {
 		const { id } = req.params
+		const { status } = req.body
 
-		const review = await Review.findById(id)
+		const allowed = ['pending', 'approved', 'rejected']
 
-		if (!review) {
-			return res
-				.status(404)
-				.json({ success: false, message: 'Review not found' })
-		}
-
-		if (review.status !== 'pending') {
+		if (!allowed.includes(status)) {
 			return res.status(400).json({
 				success: false,
-				message: `Review already ${review.status}`,
+				message: 'Invalid status value',
 			})
 		}
 
-		review.status === 'approved'
-		await review.save()
+		const review = await Review.findByIdAndUpdate(
+			id,
+			{ status },
+			{ returnDocument: 'after' },
+		)
 
-		return res.status(200).json({ success: true, review })
+		if (!review) {
+			return res.status(404).json({
+				success: false,
+				message: 'Review not found',
+			})
+		}
+
+		return res.status(200).json({
+			success: true,
+			review,
+		})
 	} catch (error) {
 		next(error)
 	}
 }
+
 export const deleteReview = async (req, res, next) => {
 	try {
 		const review = await Review.findByIdAndDelete(req.params.id)

@@ -1,15 +1,8 @@
 import { Router } from 'express'
-import {
-	createGallery,
-	deleteGallery,
-	getGallery,
-} from '../controllers/galleryController.js'
-import { requireAdminAuth } from '../middlewares/authMiddleware.js'
+import { getGallery } from '../controllers/galleryController.js'
 
 const router = Router()
 
-router.get('/', requireAdminAuth, getGallery)
-router.post('/', requireAdminAuth, createGallery)
-router.delete('/:id', requireAdminAuth, deleteGallery)
+router.get('/', getGallery)
 
 export default router

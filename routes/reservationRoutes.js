@@ -1,27 +1,8 @@
 import { Router } from 'express'
-import {
-	cancelReservation,
-	completeReservation,
-	confirmReservation,
-	createReservation,
-	deleteReservation,
-	getReservationById,
-	getReservations,
-	updateReservationStatus,
-} from '../controllers/reservationController.js'
-import { requireAdminAuth } from '../middlewares/authMiddleware.js'
+import { createReservation } from '../controllers/reservationController.js'
 
 const router = Router()
 
 router.post('/', createReservation)
-router.get('/', getReservations)
-router.get('/:id', getReservationById)
-
-router.patch('/:id/status', requireAdminAuth, updateReservationStatus)
-router.patch('/:id/confirm', requireAdminAuth, confirmReservation)
-router.patch('/:id/cancel', requireAdminAuth, cancelReservation)
-router.patch('/:id/complete', requireAdminAuth, completeReservation)
-
-router.delete('/:id', deleteReservation)
 
 export default router

@@ -34,7 +34,6 @@ function getCookieSecureFlag() {
 }
 
 function getCookieMaxAgeMs() {
-	// Best-effort: align cookie lifetime with `JWT_EXPIRES_IN` formats like "1d" / "12h".
 	const expiresIn = getJwtExpiresIn()
 	if (typeof expiresIn === 'string') {
 		if (expiresIn.endsWith('d'))
