@@ -76,8 +76,8 @@ export function loginAdmin(req, res, next) {
 		// Store token as httpOnly cookie so the admin UI can't read it via JS.
 		res.cookie('admin_jwt', token, {
 			httpOnly: true,
-			sameSite: 'lax',
-			secure: getCookieSecureFlag(),
+			sameSite: 'none',
+			secure: true,
 			maxAge: getCookieMaxAgeMs(),
 		})
 
