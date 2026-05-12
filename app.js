@@ -55,5 +55,5 @@ app.use(notFoundHandler)
 app.use(errorHandler)
 
 app.listen(port, () => {
-	console.log(`Server is live on http://localhost:${port}`)
+	console.log(`Server is live on ${port}`)
 })

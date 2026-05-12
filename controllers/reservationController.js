@@ -1,3 +1,6 @@
+import dayjs from 'dayjs'
+import timezone from 'dayjs/plugin/timezone.js'
+import utc from 'dayjs/plugin/utc.js'
 import Reservation from '../models/Reservation.js'
 import Restaurant from '../models/Restaurant.js'
 import {
@@ -11,6 +14,9 @@ import {
 	isValidStatus,
 	parseTimeToMinutes,
 } from '../utils/index.js'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 export const createReservation = async (req, res, next) => {
 	try {
@@ -40,7 +46,10 @@ export const createReservation = async (req, res, next) => {
 			})
 		}
 
-		const bookingStart = new Date(`${date}T${time}:00`)
+		const bookingStart = dayjs
+			.tz(`${date} ${time}`, 'Asia/Tashkent')
+			.utc()
+			.toDate()
 
 		if (Number.isNaN(bookingStart.getTime())) {
 			return res.status(400).json({
