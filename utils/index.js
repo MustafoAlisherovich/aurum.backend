@@ -23,26 +23,26 @@ export function isValidStatus(status) {
 }
 
 export const getCurrentStatus = workingHours => {
-	const now = new Date()
+	if (!workingHours) return { isOpen: false, closesAt: null }
+
+	const now = new Date(
+		new Date().toLocaleString('en-US', { timeZone: 'Asia/Tashkent' }),
+	)
 
 	const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
-	const todayKey = days[now.getDay()]
-	const today = workingHours[todayKey]
+	const today = workingHours[days[now.getDay()]]
 
-	if (!today || today.isClosed) {
-		return { isOpen: false, closesAt: null }
-	}
+	if (!today || today.isClosed) return { isOpen: false, closesAt: null }
 
-	const [openH, openM] = today.openTime.split(':').map(Number)
-	const [closeH, closeM] = today.closeTime.split(':').map(Number)
+	const currentTime =
+		now.getHours().toString().padStart(2, '0') +
+		':' +
+		now.getMinutes().toString().padStart(2, '0')
 
-	const openDate = new Date()
-	openDate.setHours(openH, openM, 0)
+	const open = today.openTime.padStart(5, '0')
+	const close = today.closeTime.padStart(5, '0')
 
-	const closeDate = new Date()
-	closeDate.setHours(closeH, closeM, 0)
-
-	const isOpen = now >= openDate && now <= closeDate
+	const isOpen = currentTime >= open && currentTime <= close
 
 	return {
 		isOpen,
