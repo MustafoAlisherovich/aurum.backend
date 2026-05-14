@@ -15,10 +15,15 @@ export const sendReviewEmail = async reservationId => {
 	await Reservation.findByIdAndUpdate(
 		reservationId,
 		{
-			reviewToken: token,
-			reviewTokenExpiresAt: expires,
+			$set: {
+				reviewToken: token,
+				reviewTokenExpiresAt: expires,
+			},
 		},
-		{ runValidators: true },
+		{
+			new: true,
+			runValidators: true,
+		},
 	)
 
 	const reviewLink = `${process.env.CLIENT_URL}/review/${token}`
